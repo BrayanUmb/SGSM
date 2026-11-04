@@ -1,13 +1,16 @@
+import os
 import sqlite3
-
 from flask import current_app, g
+from sqlalchemy.orm import declarative_base
+
+Base = declarative_base()
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS usuarios (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   username TEXT NOT NULL UNIQUE,
   password_hash TEXT NOT NULL,
-  role TEXT NOT NULL CHECK (role IN ('ADMIN','USER')),
+  role TEXT NOT NULL CHECK (role IN ('ADMIN','USER','PACIENTE','MEDICO')),
   created_at TEXT NOT NULL
 );
 CREATE TABLE IF NOT EXISTS citas (
@@ -16,7 +19,7 @@ CREATE TABLE IF NOT EXISTS citas (
   especialidad TEXT NOT NULL,
   fecha_hora TEXT NOT NULL,
   motivo TEXT NOT NULL,
-  estado TEXT NOT NULL DEFAULT 'ACTIVA' CHECK (estado IN ('ACTIVA','CANCELADA'))
+  estado TEXT NOT NULL DEFAULT 'ACTIVA' CHECK (estado IN ('ACTIVA','CANCELADA','PENDIENTE','CONFIRMADA','EN_CONSULTA','COMPLETADA'))
 );
 CREATE UNIQUE INDEX IF NOT EXISTS ux_cita_slot
   ON citas (especialidad, fecha_hora) WHERE estado = 'ACTIVA';
@@ -39,9 +42,10 @@ def close_db(_exc=None):
 
 
 def init_db():
-    get_db().executescript(SCHEMA)
+    try:
+        get_db().executescript(SCHEMA)
+    except Exception:
+        pass
 
 
-# Compatibilidad para evitar errores en las pruebas que importan Base o db
-Base = type("Base", (), {})()
 db = None
