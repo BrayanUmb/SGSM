@@ -2,6 +2,10 @@
 Pruebas unitarias de repositorios
 """
 
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 import pytest
 from datetime import datetime, timedelta
 from sqlalchemy import create_engine
@@ -26,8 +30,6 @@ class TestPacienteRepository:
     """Pruebas del repositorio de Pacientes"""
     
     def test_crear_paciente(self, db_session):
-        """Crear un nuevo paciente"""
-        # Preparar usuario
         usuario = Usuario(
             nombre_usuario="paciente_test",
             contrasena="pass",
@@ -37,7 +39,6 @@ class TestPacienteRepository:
         db_session.add(usuario)
         db_session.flush()
         
-        # Crear paciente
         repo = PacienteRepository(db_session)
         paciente = repo.crear(
             id_usuario=usuario.id,
@@ -52,7 +53,6 @@ class TestPacienteRepository:
         assert paciente.eps == "Test EPS"
     
     def test_obtener_paciente_por_documento(self, db_session):
-        """Obtener paciente por número de documento"""
         usuario = Usuario(
             nombre_usuario="paciente_doc",
             contrasena="pass",
@@ -79,13 +79,10 @@ class TestMedicoRepository:
     """Pruebas del repositorio de Médicos"""
     
     def test_crear_medico(self, db_session):
-        """Crear un nuevo médico"""
-        # Crear especialidad
         especialidad = Especialidad(nombre="Cardiología", descripcion="Corazón")
         db_session.add(especialidad)
         db_session.flush()
         
-        # Crear usuario
         usuario = Usuario(
             nombre_usuario="medico_test",
             contrasena="pass",
@@ -95,7 +92,6 @@ class TestMedicoRepository:
         db_session.add(usuario)
         db_session.flush()
         
-        # Crear médico
         repo = MedicoRepository(db_session)
         medico = repo.crear(
             id_usuario=usuario.id,
@@ -109,12 +105,10 @@ class TestMedicoRepository:
         assert medico.disponible == True
     
     def test_obtener_medicos_disponibles(self, db_session):
-        """Obtener solo médicos disponibles"""
         especialidad = Especialidad(nombre="Pediatría")
         db_session.add(especialidad)
         db_session.flush()
         
-        # Médico disponible
         usuario1 = Usuario(
             nombre_usuario="medico_disponible",
             contrasena="pass",
@@ -124,7 +118,6 @@ class TestMedicoRepository:
         db_session.add(usuario1)
         db_session.flush()
         
-        # Médico no disponible
         usuario2 = Usuario(
             nombre_usuario="medico_no_disponible",
             contrasena="pass",
@@ -157,8 +150,6 @@ class TestCitaRepository:
     """Pruebas del repositorio de Citas"""
     
     def test_crear_cita(self, db_session):
-        """Crear una nueva cita"""
-        # Setup
         especialidad = Especialidad(nombre="General")
         db_session.add(especialidad)
         db_session.flush()
@@ -202,7 +193,6 @@ class TestCitaRepository:
         db_session.add(consultorio)
         db_session.flush()
         
-        # Test
         repo = CitaRepository(db_session)
         fecha = (datetime.now() + timedelta(days=1)).isoformat()
         cita = repo.crear(
