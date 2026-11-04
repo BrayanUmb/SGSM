@@ -1,0 +1,13 @@
+$ bandit -r app
+	No issues identified.
+	Total lines of code: 443
+	Total issues (by severity):
+		Undefined: 0
+		Low: 0
+		Medium: 0
+		High: 0
+	Total issues (by confidence):
+		Undefined: 0
+		Low: 0
+		Medium: 0
+		High: 0

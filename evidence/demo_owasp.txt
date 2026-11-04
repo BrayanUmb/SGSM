@@ -1,0 +1,25 @@
+$ GET /api/citas/1  (otro usuario autenticado -> BOLA)
+{"error":"Appointment not found"}
+  -> HTTP 404
+
+$ 6 intentos de login fallidos (fuerza bruta)
+intento 1 -> HTTP 401
+intento 2 -> HTTP 401
+intento 3 -> HTTP 401
+intento 4 -> HTTP 401
+intento 5 -> HTTP 401
+intento 6 -> HTTP 429
+
+$ curl -i /api/health  (cabeceras de seguridad)
+HTTP/1.1 200 OK
+Server: gunicorn
+Date: Wed, 04 Nov 2026 03:18:12 GMT
+Connection: close
+Content-Type: application/json
+Content-Length: 16
+X-Content-Type-Options: nosniff
+X-Frame-Options: DENY
+Cache-Control: no-store
+Content-Security-Policy: default-src 'none'; frame-ancestors 'none'
+Strict-Transport-Security: max-age=63072000; includeSubDomains
+

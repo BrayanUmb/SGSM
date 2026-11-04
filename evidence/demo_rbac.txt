@@ -1,0 +1,15 @@
+$ GET /api/admin/dashboard  (token ADMIN)
+{"citas_activas":0,"citas_canceladas":0,"usuarios":2}
+  -> HTTP 200
+
+$ GET /api/admin/dashboard  (sin token)
+{"error":"Missing bearer token"}
+  -> HTTP 401
+
+$ GET /api/admin/dashboard  (token alterado)
+{"error":"Invalid or expired token"}
+  -> HTTP 401
+
+$ POST /api/citas  (USER agenda cita)
+{"especialidad":"PEDIATRIA","estado":"ACTIVA","fecha_hora":"2026-11-07T09:00","id":1,"motivo":"Control de rutina","usuario_id":2}
+  -> HTTP 201

@@ -1,0 +1,3 @@
+$ mutmut run && python scripts/check_mutation_score.py 50
+Mutants: 609 | killed: 548 | survived: 61 | timeout: 0 | suspicious: 0
+Mutation score: 89.98% (threshold 50%)

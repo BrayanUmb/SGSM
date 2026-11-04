@@ -1,0 +1,67 @@
+$ curl -s -X POST /api/auth/register -d {"username":"paciente1","password":"Paciente2026Ok"}
+{
+  "id": 2,
+  "role": "USER",
+  "username": "paciente1"
+}
+
+$ curl -s -X POST /api/auth/register  (intento de mass assignment: role=ADMIN)
+{"error":"Unexpected fields: role"}
+  -> HTTP 400
+
+$ curl -s -X POST /api/auth/login  (USER)
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ...",
+  "expires_in": 900,
+  "token_type": "Bearer"
+}
+
+$ GET /api/user/profile  (token USER)
+{"id":2,"role":"USER","username":"paciente1"}
+  -> HTTP 200
+
+$ GET /api/admin/dashboard  (token USER)  -> RBAC debe negar
+{"error":"Forbidden"}
+  -> HTTP 403
+
+$ GET /api/admin/dashboard  (token ADMIN)
+{"citas_activas":0,"citas_canceladas":0,"usuarios":2}
+  -> HTTP 200
+
+$ GET /api/admin/dashboard  (sin token)
+{"error":"Missing bearer token"}
+  -> HTTP 401
+
+$ GET /api/admin/dashboard  (token alterado)
+{"error":"Invalid or expired token"}
+  -> HTTP 401
+
+$ POST /api/citas  (USER agenda cita)
+{"especialidad":"PEDIATRIA","estado":"ACTIVA","fecha_hora":"2026-11-07T09:00","id":1,"motivo":"Control de rutina","usuario_id":2}
+  -> HTTP 201
+
+$ GET /api/citas/1  (otro usuario autenticado -> BOLA)
+{"error":"Appointment not found"}
+  -> HTTP 404
+
+$ 6 intentos de login fallidos (fuerza bruta)
+intento 1 -> HTTP 401
+intento 2 -> HTTP 401
+intento 3 -> HTTP 401
+intento 4 -> HTTP 401
+intento 5 -> HTTP 401
+intento 6 -> HTTP 429
+
+$ curl -i /api/health  (cabeceras de seguridad)
+HTTP/1.1 200 OK
+Server: gunicorn
+Date: Wed, 04 Nov 2026 03:18:12 GMT
+Connection: close
+Content-Type: application/json
+Content-Length: 16
+X-Content-Type-Options: nosniff
+X-Frame-Options: DENY
+Cache-Control: no-store
+Content-Security-Policy: default-src 'none'; frame-ancestors 'none'
+Strict-Transport-Security: max-age=63072000; includeSubDomains
+

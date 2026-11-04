@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      SGCM_JWT_SECRET: ci-only-secret-with-more-than-32-characters
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # SonarCloud needs full history
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements-dev.txt
+      - name: Unit tests + coverage
+        run: pytest --cov=app --cov-branch --cov-report=xml --cov-report=term-missing
+      - name: Static security scan (Bandit)
+        run: bandit -r app -q
+      - name: SonarCloud scan
+        if: env.SONAR_TOKEN != ''
+        uses: SonarSource/sonarqube-scan-action@v5
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-xml
+          path: coverage.xml
+
+  mutation:
+    runs-on: ubuntu-latest
+    needs: test
+    env:
+      SGCM_JWT_SECRET: ci-only-secret-with-more-than-32-characters
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements-dev.txt
+      - name: Mutation testing (mutmut)
+        run: mutmut run
+      - name: Quality gate - fail if mutation score < 50%
+        run: python scripts/check_mutation_score.py 50
+      - name: Mutation report
+        if: always()
+        run: mutmut results --all true > mutation-report.txt || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mutation-report
+          path: mutation-report.txt

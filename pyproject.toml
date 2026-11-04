@@ -1,0 +1,13 @@
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-q"
+
+[tool.coverage.run]
+source = ["app"]
+branch = true
+
+[tool.mutmut]
+source_paths = ["app/validators.py", "app/security.py", "app/services.py"]
+pytest_add_cli_args_test_selection = ["tests/"]
+also_copy = ["app/", "tests/", "pyproject.toml"]

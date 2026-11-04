@@ -1,0 +1,25 @@
+$ curl -s -X POST /api/auth/register -d {"username":"paciente1","password":"Paciente2026Ok"}
+{
+  "id": 2,
+  "role": "USER",
+  "username": "paciente1"
+}
+
+$ curl -s -X POST /api/auth/register  (intento de mass assignment: role=ADMIN)
+{"error":"Unexpected fields: role"}
+  -> HTTP 400
+
+$ curl -s -X POST /api/auth/login  (USER)
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ...",
+  "expires_in": 900,
+  "token_type": "Bearer"
+}
+
+$ GET /api/user/profile  (token USER)
+{"id":2,"role":"USER","username":"paciente1"}
+  -> HTTP 200
+
+$ GET /api/admin/dashboard  (token USER)  -> RBAC debe negar
+{"error":"Forbidden"}
+  -> HTTP 403
