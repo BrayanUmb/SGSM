@@ -3,7 +3,7 @@ import os
 from flask import Flask, jsonify
 from werkzeug.exceptions import HTTPException
 
-from .db import close_db, init_db
+from .db import close_db, init_db, Base, db
 from .errors import ApiError, utc_now
 from .routes import bp
 from .security import RateLimiter
