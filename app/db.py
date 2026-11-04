@@ -40,3 +40,8 @@ def close_db(_exc=None):
 
 def init_db():
     get_db().executescript(SCHEMA)
+
+
+# Compatibilidad para evitar errores en las pruebas que importan Base o db
+Base = type("Base", (), {})()
+db = None
