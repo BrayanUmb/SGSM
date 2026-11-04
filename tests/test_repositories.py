@@ -7,8 +7,8 @@ from datetime import datetime, timedelta
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from app import Base
-from models import Usuario, Paciente, Medico, Especialidad, Cita, Consultorio, RolEnum, EstadoCitaEnum
-from repositories import PacienteRepository, MedicoRepository, CitaRepository
+from app.models import Usuario, Paciente, Medico, Especialidad, Cita, Consultorio, RolEnum, EstadoCitaEnum
+from app.repositories import PacienteRepository, MedicoRepository, CitaRepository
 
 
 @pytest.fixture(scope="function")
